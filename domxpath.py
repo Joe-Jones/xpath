@@ -1,9 +1,10 @@
-import xpathc
+#import xpathc
 import domtreeimp
 from functions import function_list
-from xml.dom.ext import Print
-import parserbackend
+#from xml.dom.ext import Print
+#import parserbackend
 from xpathyylex import XPathLexer
+import parser
 
 
 class Environment :
@@ -19,8 +20,8 @@ def Compile(e) :
   #print dir(l), str(l.func_closure), l.func_dict
   #parser = xpathc.new()
   #parser.verbose = True
-  #expression = parser.parse(e)
-  expression = xpathc.parse(parserbackend.__dict__, XPathLexer(e))
+  expression = parser.parse(e)
+  #expression = xpathc.parse(parserbackend.__dict__, XPathLexer(e))
   return expression(domtreeimp)
   #return lambda node, nsMap : domtreeimp.evaluate(expression, node, nsMap)
   
@@ -51,15 +52,15 @@ doc2 = """<?xml version="1.0"?><one><two>Three</two><two/></one>"""
 
   
 if __name__ == "__main__" :
-  from xml.dom.ext.reader import Sax2
+  #from xml.dom.ext.reader import Sax2
   from xml.dom.minidom import parseString
   from trace import trace
-  reader = Sax2.Reader()
-  doc1 = reader.fromString(doc)
+  #reader = Sax2.Reader()
+  #doc1 = reader.fromString(doc)
   doc2 = parseString(doc)
   #doc = reader.fromSt("DnD.xml")
   #expr = Compile("/d_n_d_players/player/../../d_n_d_players/player/character")
-  expr = Compile("count(/descendant::*/attribute::*) = 4")
+  expr = Compile("/root/*")
   #expr = Compile(" 2 + 5 * 3")
   #for n in range(1) :
   #  if n % 100 == 0 :
@@ -70,7 +71,7 @@ if __name__ == "__main__" :
   #    #pass
   result = expr(trace(doc2), Environment())
   print repr(result)
-  #for r in result:
-  #  print repr(r)
+  for r in result:
+    print repr(r)
   #expr(test_doc, Environment())
   

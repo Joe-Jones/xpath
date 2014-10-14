@@ -1,5 +1,29 @@
 import re
-from xpathc import *
+
+tokens = (
+  'NCNAME',
+  'VARIABLEREF',
+  'FUNCTIONNAME',
+  'AXISNAME',
+  'DOUBLESLASH',
+  'DOUBLEDOT',
+  'NEQ',
+  'LTEQ',
+  'GTEQ',
+  'NUMBER',
+  'LITERAL',
+  'OR',
+  'AND',
+  'MUL',
+  'MOD',
+  'DIV',
+  'ADD',
+#  '',
+#  ''
+)
+
+for t in tokens :
+  exec(t + " = '" + t + "'")
 
 NCName = "[a-zA-Z_][a-zA-Z0-9_.-]*"
 QName = "(%s:)?%s" % (NCName, NCName)
@@ -12,17 +36,26 @@ ASCII = "ascii"
 JUMP = "jump"
 IGNORE = "ignore"
 
+class LexToken:
+  
+    def __init__(self, type, value) :
+        #print "type = %s, value = %s" % (type, value)
+        self.type = type
+        self.value = value
+        self.lineno = 0
+        self.lexpos = 0
+
 class XPathLexer :
 
-    def __init__(self, query_string) :
+    def __init__(self) :
         self.states = {
             INITIAL: [
                 ("%s" % NCName, NCNAME, INITIAL),
-                ("$%s*%s" % (S, QName), VARIABLE_REF, INITIAL),
-                ("%s%s*\\(" % (NCName, S), FUNCTION_NAME, INITIAL),
-                ("%s%s*::" % (NCName, S), AXIS_NAME, INITIAL),
-                ("\/\/", DOUBLE_SLASH, INITIAL),
-                ("\.\.", DOUBLE_DOT, INITIAL),
+                ("$%s*%s" % (S, QName), VARIABLEREF, INITIAL),
+                ("%s%s*\\(" % (NCName, S), FUNCTIONNAME, INITIAL),
+                ("%s%s*::" % (NCName, S), AXISNAME, INITIAL),
+                ("\/\/", DOUBLESLASH, INITIAL),
+                ("\.\.", DOUBLEDOT, INITIAL),
                 ("!=", NEQ, INITIAL),
                 ("<=", LTEQ, INITIAL),
                 (">=", GTEQ, INITIAL),
@@ -44,12 +77,16 @@ class XPathLexer :
                 s = self.states[state][n]
                 self.states[state][n] = (re.compile(s[0]), s[1], s[2])
         self.state = INITIAL
-        self.query_string = query_string
+        #self.query_string = query_string
         #foo ="Hi there"
         #print "state : ", state
+        
+    def input(self, query_string) :
+        #print "Input = " + query_string
+        self.query_string = query_string
 
-    def __call__(self) :
-        #print s
+    def token(self) :
+        #print "token"
         while True :
             #print foo
             longest_pattern = None
@@ -64,7 +101,8 @@ class XPathLexer :
                     value = match.group()
             if length == 0 :
                 #print "End"
-                return 0, None
+                #return 0, None
+                return
             if longest_pattern[1] == IGNORE :
                 self.query_string = self.query_string[length:]
                 self.state = longest_pattern[2]
@@ -78,10 +116,10 @@ class XPathLexer :
             if longest_pattern[1] == ASCII :
                 self.query_string = self.query_string[length:]
                 #print "c", value, self.state
-                return ord(value), None
+                return LexToken(value, None)
             #print value, self.state
             self.query_string = self.query_string[length:]
-            return longest_pattern[1], value
+            return LexToken(longest_pattern[1], value)
     
 
 
