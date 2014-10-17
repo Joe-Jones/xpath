@@ -9,6 +9,6 @@ I've replaced the Bison based parser with a python one using the ply parser gene
 
 All the test cases pass apart from one, which I think is showing up a difference in dom implementations not a problem with the xpath implementation. I've commented it out.
 
-I've added a demo app that takes the form of a daemon that binds to port 8888 and presents a user interface in a web browser.
+I've added a demo app that presents a user interface in a web browser allowing the user to run xpath queries on an xml document.
 
-I've used the Flask to create the daemon and the React javascript library to create the user interface. I've never used either of these before but I was quite interested in using React.
+I've used the Flask to create the daemon and the React javascript library to create the user interface. I've never used either of these before, I was really interested in using React though.
