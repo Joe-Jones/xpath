@@ -57,7 +57,7 @@ def string_value(node) :
 #Casting xpath types, These functions can operate on packed objects
 
 def unPack(i) :
-  if type(i) in StringTypes :
+  if type(i) is str :
     return i
   if not isaSequence(i) :
     return i
@@ -72,7 +72,7 @@ def unPack(i) :
     return first
     
 def isaSequence(i) :
-  if type(i) in StringTypes :
+  if type(i) is str :
     return False
   try :
     iter(i)
@@ -90,11 +90,11 @@ def boolean(n) :
   if isaSequence(unpacked) :
     return not isEmptySequence(unpacked)
   t = type(unpacked)
-  if t is BooleanType :
+  if t is bool :
     return unpacked
-  if t is FloatType :
+  if t is float :
     return unpacked != 0
-  if t in StringTypes :
+  if t is str :
     return unpacked != ""
   raise "Hell"
   
@@ -103,12 +103,12 @@ def number(n) :
   if isaSequence(unpacked) or type(unpacked) == InstanceType:
     return float(string(unpacked))
   t = type(unpacked)
-  if t is BooleanType :
+  if t is bool :
     if unpacked : return float(1)
     else : return float(0)
-  if t is FloatType :
+  if t is float :
     return unpacked
-  if t in StringTypes :
+  if t is str :
     return float(unpacked)
   raise "Hell"
   
@@ -120,16 +120,16 @@ def string(n) :
     else :
       return string_value(iter(unpacked).next())
   t = type(unpacked)
-  if t is BooleanType :
+  if t is bool :
     if unpacked : return u"true"
     else : return u"false"
-  if t is FloatType :
+  if t is float :
     if unpacked % 1 == 0 :
       return  "%d" % unpacked
     else :
       return "%f" % unpacked
   if t is InstanceType :
     return string_value(unpacked)
-  if t in StringTypes :
+  if t is str :
     return unpacked
   raise "Hell"    

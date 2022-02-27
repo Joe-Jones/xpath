@@ -1,11 +1,10 @@
-from types import BooleanType, FloatType
-from operator import lt, le, eq, ne, ge, gt, add, div, mod, mul, sub, or_, and_
-from itertools import chain, ifilter, imap, repeat
+from operator import lt, le, eq, ne, ge, gt, add, truediv, mod, mul, sub, or_, and_
+from itertools import chain, repeat
 from xml.dom import Node
 from datamodel import any, boolean, isaSequence, number, string, unPack, allDescendants, allDescendantsAndSelf
 
 def shout(message, value) :
-  print message
+  print(message)
   return value      
 
 class Counter :
@@ -60,16 +59,16 @@ def filterExpr(expr, predicates) :
 def predicate(expr) :
   def predicateTest(node, predicate_value) :
     unpacked = unPack(predicate_value)
-    if type(unpacked) == FloatType :
+    if type(unpacked) is float :
       return unpacked == node[1]
     else :
       return boolean(unpacked)
   return (lambda front :
       (lambda node, env :
-          imap(
+          map(
               lambda n :
                   n[0],
-              ifilter(
+              filter(
                   lambda n : 
                       predicateTest(n, expr(n, env)),
                   Counter(
@@ -145,11 +144,11 @@ def nameTest(full_name) :
     ns = parts[0]
     name = parts[1]
   return (lambda node_list, env : 
-      ifilter(
+      filter(
           _nameTest(
               env.nsMap[ns],
               name),
-          ifilter(
+          filter(
               lambda node : (node.nodeType == Node.ELEMENT_NODE or
                              node.nodeType == Node.ATTRIBUTE_NODE),
               node_list)))
@@ -161,13 +160,13 @@ def typeTest(nodeType) :
 
 def comment(literal) :
   def commentFilter(node_list, env) :
-    return ifilter(typeTest(Node.COMMENT_NODE), node_list)
+    return filter(typeTest(Node.COMMENT_NODE), node_list)
   return commentFilter
     
   
 def text(literal) :
   def textFilter(node_list, env) :
-    return ifilter(typeTest(Node.TEXT_NODE), node_list)
+    return filter(typeTest(Node.TEXT_NODE), node_list)
   return textFilter
   
 def processing_instruction(literal) :
@@ -206,7 +205,7 @@ def createNodeSetCapableOperator(operator) :
     i2 = unPack(i2)
     type1 = type(i1)
     type2 = type(i2)
-    if type1 == BooleanType or type2 == BooleanType :
+    if type1 is bool or type2 is bool :
       return operator(boolean(i1),boolean(i2))
     if isaSequence(i1) :
       if isaSequence(i2) :
@@ -222,9 +221,9 @@ def createEqualityOperator(operator) :
   def equalityOperator(i1, i2) :
     type1 = type(i1)
     type2 = type(i2)
-    if type1 == BooleanType or type2 == BooleanType :
+    if type1 is bool or type2 is bool :
       return operator(boolean(i1), boolean(i2))
-    if type1 == FloatType or type2 == FloatType :
+    if type1 is float or type2 is float :
       return operator(number(i1), number(i2))
     return operator(string(i1), string(i2))
   return equalityOperator
@@ -265,7 +264,7 @@ operator_map = {
     
     "+" : createXPathOperator(createArithmeticOperator(add)),
     "-" : createXPathOperator(createArithmeticOperator(sub)),
-    "div" : createXPathOperator(createArithmeticOperator(div)),
+    "div" : createXPathOperator(createArithmeticOperator(truediv)),
     "mod" : createXPathOperator(createArithmeticOperator(mod)),
     "*" : createXPathOperator(createArithmeticOperator(mul)),
 
@@ -309,7 +308,7 @@ def evaluatePath(expr, node_list, env) :
     return evaluatePath(
                expr[1:],
                chain(
-                   *imap(
+                   *map(
                        evaluatePartOnElement,
                        repeat(expr[0]),
                        node_list,

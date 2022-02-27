@@ -70,8 +70,8 @@ if __name__ == "__main__" :
   #    print
   #    #pass
   result = expr(trace(doc2), Environment())
-  print repr(result)
+  print(repr(result))
   for r in result:
-    print repr(r)
+    print(repr(r))
   #expr(test_doc, Environment())
   
